@@ -39,7 +39,12 @@ test("scaffolds a workspace that uses multi-gws without private state", async ()
     await readFile(join(target, ".agents/skills/add-account/SKILL.md"), "utf8");
     await assert.rejects(readFile(join(target, "bin/gws-account.mjs"), "utf8"));
     await assert.rejects(readFile(join(target, "lib/gws-command-policy.mjs"), "utf8"));
-    await assert.rejects(readFile(join(target, "package-lock.json"), "utf8"));
+    const generatedLock = JSON.parse(await readFile(join(target, "package-lock.json"), "utf8"));
+    assert.equal(generatedLock.packages["node_modules/multi-gws"].version, "0.0.1");
+    assert.equal(
+      generatedLock.packages["node_modules/multi-gws"].resolved,
+      "https://registry.npmjs.org/multi-gws/-/multi-gws-0.0.1.tgz",
+    );
 
     const gitignore = await readFile(join(target, ".gitignore"), "utf8");
     assert.match(gitignore, /^credentials\/$/m);
