@@ -4,9 +4,9 @@ import { spawnSync } from "node:child_process";
 import { createHash } from "node:crypto";
 import {
   chmodSync,
+  copyFileSync,
   lstatSync,
   mkdirSync,
-  symlinkSync,
   writeFileSync,
 } from "node:fs";
 import { dirname, join } from "node:path";
@@ -102,7 +102,7 @@ const credentialsDir = join(root, "credentials");
 const oauthClient = join(credentialsDir, "google-oauth-client.json");
 const accountDir = join(root, "accounts", slug);
 const configDir = join(accountDir, "gws");
-const clientLink = join(configDir, "client_secret.json");
+const accountOauthClient = join(configDir, "client_secret.json");
 const accessProfile = join(configDir, "access.json");
 
 function saveAccessProfile() {
@@ -127,9 +127,14 @@ mkdirSync(configDir, { recursive: true, mode: 0o700 });
 chmodSync(accountDir, 0o700);
 chmodSync(configDir, 0o700);
 
-if (!pathExists(clientLink)) {
-  symlinkSync("../../../credentials/google-oauth-client.json", clientLink);
+if (pathExists(accountOauthClient)) {
+  const accountOauthClientFile = lstatSync(accountOauthClient);
+  if (!accountOauthClientFile.isFile() || accountOauthClientFile.isSymbolicLink()) {
+    fail(EX_NOINPUT, `account OAuth client must be a regular file: ${accountOauthClient}`);
+  }
 }
+copyFileSync(oauthClient, accountOauthClient);
+chmodSync(accountOauthClient, 0o600);
 
 console.log(`Account slug: ${slug}`);
 console.log(`Gmail access: ${gmail}`);

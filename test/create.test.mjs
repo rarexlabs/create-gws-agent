@@ -6,7 +6,6 @@ import {
   mkdir,
   readFile,
   readdir,
-  readlink,
   realpath,
   rm,
   symlink,
@@ -33,8 +32,8 @@ test("scaffolds the workspace without private state", async () => {
     const generatedPackage = JSON.parse(await readFile(join(target, "package.json"), "utf8"));
     assert.equal(generatedPackage.name, "gworkspace-agent");
     assert.equal(generatedPackage.packageManager, "npm@10.9.4");
-    assert.equal(generatedPackage.engines.node, ">=18.17.0");
-    assert.deepEqual(generatedPackage.os, ["darwin"]);
+    assert.equal(generatedPackage.engines.node, ">=22");
+    assert.equal("os" in generatedPackage, false);
     assert.equal(generatedPackage.license, "MIT");
     assert.equal(generatedPackage.scripts.gws, "node bin/gws-account.mjs");
     assert.equal(generatedPackage.scripts["account:add"], "node bin/add-account.mjs");
@@ -147,6 +146,39 @@ test("wrapper distinguishes prohibited and confirmation-required operations", as
   }
 });
 
+test("wrapper launches the installed CLI through its cross-platform Node entry point", async () => {
+  const root = await mkdtemp(join(tmpdir(), "create-gws-agent-"));
+  const target = join(root, "my-workspace");
+
+  try {
+    const scaffold = spawnSync(process.execPath, [cli, target, "--no-install", "--no-git"], {
+      encoding: "utf8",
+    });
+    assert.equal(scaffold.status, 0, scaffold.stderr);
+
+    await mkdir(join(target, "accounts/test/gws"), { recursive: true });
+    const cliPackage = join(target, "node_modules/@googleworkspace/cli");
+    await mkdir(cliPackage, { recursive: true });
+    await writeFile(
+      join(cliPackage, "run.js"),
+      "console.log(process.argv.slice(2).join('\\n'));\n",
+    );
+
+    const env = { ...process.env };
+    delete env.GWS_EXECUTABLE;
+    const result = spawnSync(
+      process.execPath,
+      [join(target, "bin/gws-account.mjs"), "test", "drive", "files", "list"],
+      { encoding: "utf8", env },
+    );
+
+    assert.equal(result.status, 0, result.stderr);
+    assert.equal(result.stdout, "drive\nfiles\nlist\n");
+  } finally {
+    await rm(root, { recursive: true, force: true });
+  }
+});
+
 test("wrapper ignores inherited credentials for a different account", async () => {
   const root = await mkdtemp(join(tmpdir(), "create-gws-agent-"));
   const target = join(root, "my-workspace");
@@ -221,7 +253,7 @@ test("wrapper ignores inherited credentials for a different account", async () =
   }
 });
 
-test("account setup creates private account state linked to the shared OAuth client", async () => {
+test("account setup creates private account state with a copy of the shared OAuth client", async () => {
   const root = await mkdtemp(join(tmpdir(), "create-gws-agent-"));
   const target = join(root, "my-workspace");
   const fakeGws = join(root, "fake-gws");
@@ -253,7 +285,7 @@ test("account setup creates private account state linked to the shared OAuth cli
 
     const accountDir = join(target, "accounts", slug);
     const configDir = join(accountDir, "gws");
-    const link = join(configDir, "client_secret.json");
+    const accountOauthClient = join(configDir, "client_secret.json");
     const accessProfile = JSON.parse(await readFile(join(configDir, "access.json"), "utf8"));
     assert.equal((await lstat(join(target, "credentials"))).mode & 0o777, 0o700);
     assert.equal(
@@ -262,7 +294,9 @@ test("account setup creates private account state linked to the shared OAuth cli
     );
     assert.equal((await lstat(accountDir)).mode & 0o777, 0o700);
     assert.equal((await lstat(configDir)).mode & 0o777, 0o700);
-    assert.equal(await readlink(link), "../../../credentials/google-oauth-client.json");
+    assert.equal((await lstat(accountOauthClient)).isSymbolicLink(), false);
+    assert.equal((await lstat(accountOauthClient)).mode & 0o777, 0o600);
+    assert.equal(await readFile(accountOauthClient, "utf8"), "{}\n");
     assert.deepEqual(accessProfile, {
       email: "Roy.Test+Home@example.com",
       gmail: "manage",

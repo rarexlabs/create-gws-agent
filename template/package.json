@@ -6,11 +6,8 @@
   "license": "MIT",
   "packageManager": "npm@10.9.4",
   "engines": {
-    "node": ">=18.17.0"
+    "node": ">=22"
   },
-  "os": [
-    "darwin"
-  ],
   "scripts": {
     "gws": "node bin/gws-account.mjs",
     "account:add": "node bin/add-account.mjs"

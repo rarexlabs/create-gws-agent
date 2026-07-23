@@ -16,7 +16,7 @@ Add and authorize an account with:
 npm run account:add -- <email-address> --gmail=<none|read|manage> --drive=<none|read|manage>
 ```
 
-The wrapper selects `accounts/<account-slug>/gws` through `GOOGLE_WORKSPACE_CLI_CONFIG_DIR` and requires the macOS Keychain backend.
+The wrapper selects `accounts/<account-slug>/gws` through `GOOGLE_WORKSPACE_CLI_CONFIG_DIR` and uses the operating system's secure credential storage with the CLI's encrypted file fallback.
 
 ## Credentials
 

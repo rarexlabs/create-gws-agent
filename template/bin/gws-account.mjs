@@ -43,6 +43,15 @@ function isExecutable(path) {
   }
 }
 
+function isFile(path) {
+  try {
+    return statSync(path).isFile();
+  } catch (error) {
+    if (error.code === "ENOENT") return false;
+    throw error;
+  }
+}
+
 function ensureRuntimeDirectory(path) {
   mkdirSync(path, { recursive: true, mode: 0o700 });
   const directory = lstatSync(path);
@@ -109,7 +118,10 @@ if (!/^[A-Za-z0-9._-]+$/.test(account) || account.startsWith(".") || account.inc
 const root = dirname(dirname(fileURLToPath(import.meta.url)));
 const configDir = join(root, "accounts", account, "gws");
 const runtimeDir = join(configDir, ".runtime");
-const gwsExecutable = process.env.GWS_EXECUTABLE || join(root, "node_modules", ".bin", "gws");
+const gwsOverride = process.env.GWS_EXECUTABLE;
+const gwsEntrypoint = join(root, "node_modules", "@googleworkspace", "cli", "run.js");
+const gwsExecutable = gwsOverride || process.execPath;
+const gwsPrefixArgs = gwsOverride ? [] : [gwsEntrypoint];
 
 if (!isDirectory(configDir)) {
   console.error(`gws-account: unknown account: ${account}`);
@@ -117,7 +129,7 @@ if (!isDirectory(configDir)) {
   process.exit(EX_NOINPUT);
 }
 
-if (!isExecutable(gwsExecutable)) {
+if (gwsOverride ? !isExecutable(gwsExecutable) : !isFile(gwsEntrypoint)) {
   fail(EX_UNAVAILABLE, "gws is not installed; run: npm install");
 }
 
@@ -136,7 +148,7 @@ delete gwsEnv.GOOGLE_WORKSPACE_CLI_CLIENT_ID;
 delete gwsEnv.GOOGLE_WORKSPACE_CLI_CLIENT_SECRET;
 delete gwsEnv.GOOGLE_WORKSPACE_CLI_CREDENTIALS_FILE;
 
-const result = spawnSync(gwsExecutable, gwsArgs, {
+const result = spawnSync(gwsExecutable, [...gwsPrefixArgs, ...gwsArgs], {
   cwd: runtimeDir,
   env: {
     ...gwsEnv,

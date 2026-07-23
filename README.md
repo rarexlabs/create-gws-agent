@@ -16,8 +16,7 @@ The setup skill checks dependencies, guides Google OAuth client creation when ne
 
 ## Requirements
 
-- macOS, because the generated agent stores Google account tokens in Keychain
-- Node.js 18.17 or newer
+- Node.js 22 or newer
 - npm 10 (the generated project pins npm 10.9.4)
 
 ## Options
