@@ -1,6 +1,6 @@
 # create-gws-agent
 
-Scaffold a minimal npm workspace for account-scoped Gmail and Google Drive agent workflows.
+Scaffold a minimal npm workspace for account-scoped Gmail, Google Drive, and Google Calendar agent workflows.
 
 ```bash
 npm create gws-agent@latest my-workspace
@@ -14,7 +14,7 @@ Use $setup to prepare this Google Workspace agent.
 
 The generated workspace uses [`multi-gws`](https://www.npmjs.com/package/multi-gws), through its `mgws` command, to isolate accounts and apply safety rules while forwarding Google Workspace CLI commands.
 
-The setup skill checks dependencies, guides Google OAuth client creation when needed, and connects the first Google account.
+The setup skill checks dependencies, guides Google OAuth client creation when needed, and connects the first Google account with the selected Gmail, Drive, and Calendar permissions.
 
 ## Requirements
 

@@ -1,4 +1,4 @@
 interface:
   display_name: "Add Account"
-  short_description: "Connect Gmail and Drive with chosen access"
+  short_description: "Connect Gmail, Drive, and Calendar access"
   default_prompt: "Use $add-account to connect a Google account with recommended access."

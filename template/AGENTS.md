@@ -1,6 +1,6 @@
 # Google Workspace Agent
 
-This repository provides account-scoped access to Gmail and Google Drive through `mgws`, a multi-account safety wrapper for the Google Workspace CLI.
+This repository provides account-scoped access to Gmail, Google Drive, and Google Calendar through `mgws`, a multi-account safety wrapper for the Google Workspace CLI.
 
 ## Commands
 
@@ -13,7 +13,7 @@ npm run gws -- <account-slug> <gws arguments...>
 Add and authorize an account with:
 
 ```bash
-npm run account:add -- <email-address> --gmail=<none|read|manage> --drive=<none|read|manage>
+npm run account:add -- <email-address> --gmail=<none|read|manage> --drive=<none|read|manage> --calendar=<none|read|manage>
 ```
 
 `mgws` selects `accounts/<account-slug>/gws` through `GOOGLE_WORKSPACE_CLI_CONFIG_DIR` and uses the operating system's secure credential storage with the CLI's encrypted file fallback.
@@ -35,7 +35,8 @@ The selected non-secret access profile is recorded as `accounts/<account-slug>/g
 - Use the repository `add-account` skill for adding accounts, re-authentication, or changing account permissions after initial setup.
 - Use the repository `gmail` skill for Gmail and inbox work.
 - Use the repository `drive` skill for Drive, Docs, Sheets, Slides, sharing, and permission work.
-- A request may use both skills.
+- Use the repository `calendar` skill for Calendar events, schedules, availability, invitations, and calendar sharing.
+- A request may use more than one service skill.
 
 ## Communication
 
@@ -54,15 +55,18 @@ Always show a human-readable preview and obtain explicit confirmation immediatel
 
 - sending, replying to, or forwarding email;
 - granting public or external Drive access;
-- changing Drive permissions; or
-- transferring Drive ownership.
+- changing Drive permissions;
+- transferring Drive ownership;
+- creating, changing, moving, or cancelling Calendar events; or
+- changing Calendar sharing rules.
 
 The preview must identify:
 
 - the Google account being used and the action being performed;
 - for existing email, the sender, subject, and date;
 - for outgoing email, the recipients, subject, and final message body;
-- for Drive items, the file or folder name and its location; and
+- for Drive items, the file or folder name and its location;
+- for Calendar events, the event title, calendar, date, time, time zone, attendees, and whether the change affects one occurrence or a recurring series; and
 - the number of affected items for bulk actions.
 
 Do not use opaque resource IDs as the primary description. Retain them privately when needed for accurate execution and verification.
@@ -73,4 +77,5 @@ Confirmation applies only to the exact account, action, content, and targets sho
 
 - Never permanently delete Gmail messages, threads, or drafts. Interpret deleting email as moving it to Trash.
 - Never permanently delete Drive files, empty Drive Trash, or delete Drive revisions.
+- Never permanently clear or delete a calendar.
 - Confirmation does not override these prohibitions.

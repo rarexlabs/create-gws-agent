@@ -22,7 +22,7 @@ test("scaffolds a workspace that uses multi-gws without private state", async ()
     assert.equal(generatedPackage.name, "gworkspace-agent");
     assert.equal(generatedPackage.packageManager, "npm@11.18.0");
     assert.equal(generatedPackage.engines.node, ">=22.9.0");
-    assert.deepEqual(generatedPackage.dependencies, { "multi-gws": "0.0.1" });
+    assert.deepEqual(generatedPackage.dependencies, { "multi-gws": "0.0.2" });
     assert.deepEqual(generatedPackage.allowScripts, {
       "@googleworkspace/cli@0.22.5": true,
     });
@@ -31,19 +31,34 @@ test("scaffolds a workspace that uses multi-gws without private state", async ()
     assert.equal("os" in generatedPackage, false);
     assert.equal(generatedPackage.license, "MIT");
 
-    await readFile(join(target, "AGENTS.md"), "utf8");
+    const agents = await readFile(join(target, "AGENTS.md"), "utf8");
+    assert.match(agents, /--calendar=<none\|read\|manage>/);
     await readFile(join(target, "LICENSE"), "utf8");
     await readFile(join(target, ".agents/skills/gmail/SKILL.md"), "utf8");
     await readFile(join(target, ".agents/skills/drive/SKILL.md"), "utf8");
-    await readFile(join(target, ".agents/skills/setup/SKILL.md"), "utf8");
-    await readFile(join(target, ".agents/skills/add-account/SKILL.md"), "utf8");
+    const calendarSkill = await readFile(
+      join(target, ".agents/skills/calendar/SKILL.md"),
+      "utf8",
+    );
+    assert.match(calendarSkill, /npm run gws -- <account-slug> calendar/);
+    assert.match(calendarSkill, /pass `--confirm`/);
+    const setupSkill = await readFile(
+      join(target, ".agents/skills/setup/SKILL.md"),
+      "utf8",
+    );
+    assert.match(setupSkill, /Google Calendar API/);
+    const addAccountSkill = await readFile(
+      join(target, ".agents/skills/add-account/SKILL.md"),
+      "utf8",
+    );
+    assert.match(addAccountSkill, /--calendar=<level>/);
     await assert.rejects(readFile(join(target, "bin/gws-account.mjs"), "utf8"));
     await assert.rejects(readFile(join(target, "lib/gws-command-policy.mjs"), "utf8"));
     const generatedLock = JSON.parse(await readFile(join(target, "package-lock.json"), "utf8"));
-    assert.equal(generatedLock.packages["node_modules/multi-gws"].version, "0.0.1");
+    assert.equal(generatedLock.packages["node_modules/multi-gws"].version, "0.0.2");
     assert.equal(
       generatedLock.packages["node_modules/multi-gws"].resolved,
-      "https://registry.npmjs.org/multi-gws/-/multi-gws-0.0.1.tgz",
+      "https://registry.npmjs.org/multi-gws/-/multi-gws-0.0.2.tgz",
     );
 
     const gitignore = await readFile(join(target, ".gitignore"), "utf8");

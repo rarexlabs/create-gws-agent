@@ -2,7 +2,7 @@
   "name": "gworkspace-agent",
   "version": "0.1.0",
   "private": true,
-  "description": "Minimal npm workspace for Gmail and Google Drive agent workflows",
+  "description": "Minimal npm workspace for Gmail, Google Drive, and Google Calendar agent workflows",
   "license": "MIT",
   "packageManager": "npm@11.18.0",
   "engines": {
@@ -13,7 +13,7 @@
     "account:add": "mgws account add"
   },
   "dependencies": {
-    "multi-gws": "0.0.1"
+    "multi-gws": "0.0.2"
   },
   "allowScripts": {
     "@googleworkspace/cli@0.22.5": true

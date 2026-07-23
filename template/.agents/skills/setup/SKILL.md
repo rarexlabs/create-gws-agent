@@ -22,7 +22,7 @@ Setup is complete only when the local `mgws` executable, shared OAuth client, an
 
 Before giving the user any setup steps, explain the purpose in plain language:
 
-> Before I can help with Gmail or Google Drive, Google needs a way to recognize me. We'll create something called an OAuth client, which you can think of as my ID card when I talk to Google from this directory.
+> Before I can help with Gmail, Google Drive, or Google Calendar, Google needs a way to recognize me. We'll create something called an OAuth client, which you can think of as my ID card when I talk to Google from this directory.
 >
 > This ID card alone does not give me access to your Google account. When you connect an account, I'll ask Google for the permissions I need. Google will show you those permissions and ask you to approve them.
 >
@@ -40,6 +40,7 @@ Have the user open **APIs & Services → Library**, find each API, and select **
 
 - Gmail API
 - Google Drive API
+- Google Calendar API
 - Google Docs API
 - Google Sheets API
 - Google Slides API

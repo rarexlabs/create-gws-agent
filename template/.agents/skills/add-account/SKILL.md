@@ -1,6 +1,6 @@
 ---
 name: add-account
-description: Add, reconnect, or change permissions for a Google account after this repository's shared OAuth client is configured. Use for connecting another account, re-running OAuth, or changing Gmail and Drive access levels.
+description: Add, reconnect, or change permissions for a Google account after this repository's shared OAuth client is configured. Use for connecting another account, re-running OAuth, or changing Gmail, Drive, and Calendar access levels.
 ---
 
 # Add Account
@@ -15,15 +15,17 @@ Use the repository command only after translating the user's choice into explici
 
    - Gmail manage: read and organize mail; manage labels, drafts, settings, and filters; send only with confirmation.
    - Drive manage: view and manage files and folders; sharing changes require confirmation.
-   - Permanent Gmail and Drive deletion remains prohibited.
+   - Calendar manage: view calendars and availability; manage events and sharing; event and sharing changes require confirmation.
+   - Permanent Gmail and Drive deletion and permanently clearing or deleting calendars remain prohibited.
 
-   Ask: `Use the recommended Gmail manage and Drive manage access for <email-address>?`
+   Ask: `Use the recommended Gmail manage, Drive manage, and Calendar manage access for <email-address>?`
 
-4. If the user accepts, select `gmail=manage` and `drive=manage`.
+4. If the user accepts, select `gmail=manage`, `drive=manage`, and `calendar=manage`.
 5. Do not show the full choice list unless the user declines or asks to customize. Then offer these choices independently:
 
    - Gmail `none`, `read`, or `manage`. Manage includes labels, settings, and filters.
    - Drive `none`, `read`, or `manage`.
+   - Calendar `none`, `read`, or `manage`.
 
 6. Summarize a custom selection and obtain confirmation. Require at least one enabled service.
 7. Before starting authorization, explain:
@@ -33,7 +35,7 @@ Use the repository command only after translating the user's choice into explici
 8. Run:
 
 ```bash
-npm run account:add -- <email-address> --gmail=<level> --drive=<level>
+npm run account:add -- <email-address> --gmail=<level> --drive=<level> --calendar=<level>
 ```
 
 9. Tell the user to select the same Google account in the browser and complete Google's OAuth consent. Do not claim success until the command exits successfully.
@@ -47,5 +49,7 @@ Do not use `--no-login`; it exists for local validation only. Do not pass raw OA
 - Gmail `manage`: read, organize, draft, send, manage labels, and change basic settings and filters.
 - Drive `read`: view and download files.
 - Drive `manage`: view and manage all Drive files.
+- Calendar `read`: view calendars, events, and availability.
+- Calendar `manage`: view and manage calendars, events, and sharing rules.
 
 Gmail `manage` includes Google's sending capability at the OAuth level. Continue to follow the repository confirmation policy before sending. Permission selection never overrides prohibited permanent-deletion operations.
