@@ -27,3 +27,7 @@ The setup skill checks dependencies, guides Google OAuth client creation when ne
 --no-git      Skip git initialization
 --help        Show usage
 ```
+
+## License
+
+MIT

@@ -64,7 +64,7 @@ Explain:
 
    > The file you downloaded is the ID card (OAuth client) we just created. Drag and drop it into this chat, and I'll move it to the right place in this directory.
 
-5. After the user attaches the file, move it to `credentials/google-oauth-client.json`, creating the `credentials` directory if needed. Handle the filename and location without reading, parsing, or displaying the file's contents.
+5. After the user attaches the file, move it to `credentials/google-oauth-client.json`, creating `credentials` with owner-only permissions (`0700`) if needed. Set the file to owner-only permissions (`0600`) and do not accept a symbolic link at either path. Handle the filename and location without reading, parsing, or displaying the file's contents.
 6. Verify only that the file exists at the expected location.
 
 Never ask the user to paste the JSON contents into chat. Never print, summarize, or commit the OAuth client.

@@ -9,6 +9,7 @@ import {
   readlink,
   realpath,
   rm,
+  symlink,
   writeFile,
 } from "node:fs/promises";
 import { tmpdir } from "node:os";
@@ -34,9 +35,11 @@ test("scaffolds the workspace without private state", async () => {
     assert.equal(generatedPackage.packageManager, "npm@10.9.4");
     assert.equal(generatedPackage.engines.node, ">=18.17.0");
     assert.deepEqual(generatedPackage.os, ["darwin"]);
+    assert.equal(generatedPackage.license, "MIT");
     assert.equal(generatedPackage.scripts.gws, "node bin/gws-account.mjs");
     assert.equal(generatedPackage.scripts["account:add"], "node bin/add-account.mjs");
     await readFile(join(target, "AGENTS.md"), "utf8");
+    await readFile(join(target, "LICENSE"), "utf8");
     await readFile(join(target, ".agents/skills/gmail/SKILL.md"), "utf8");
     await readFile(join(target, ".agents/skills/drive/SKILL.md"), "utf8");
     await readFile(join(target, ".agents/skills/setup/SKILL.md"), "utf8");
@@ -252,6 +255,11 @@ test("account setup creates private account state linked to the shared OAuth cli
     const configDir = join(accountDir, "gws");
     const link = join(configDir, "client_secret.json");
     const accessProfile = JSON.parse(await readFile(join(configDir, "access.json"), "utf8"));
+    assert.equal((await lstat(join(target, "credentials"))).mode & 0o777, 0o700);
+    assert.equal(
+      (await lstat(join(target, "credentials/google-oauth-client.json"))).mode & 0o777,
+      0o600,
+    );
     assert.equal((await lstat(accountDir)).mode & 0o777, 0o700);
     assert.equal((await lstat(configDir)).mode & 0o777, 0o700);
     assert.equal(await readlink(link), "../../../credentials/google-oauth-client.json");
@@ -264,6 +272,41 @@ test("account setup creates private account state linked to the shared OAuth cli
       result.stdout,
       /auth\nlogin\n--scopes\nhttps:\/\/www\.googleapis\.com\/auth\/gmail\.modify,https:\/\/www\.googleapis\.com\/auth\/gmail\.labels,https:\/\/www\.googleapis\.com\/auth\/gmail\.settings\.basic,https:\/\/www\.googleapis\.com\/auth\/drive\.readonly/,
     );
+  } finally {
+    await rm(root, { recursive: true, force: true });
+  }
+});
+
+test("account setup rejects a symbolic link as the OAuth client", async () => {
+  const root = await mkdtemp(join(tmpdir(), "create-gws-agent-"));
+  const target = join(root, "my-workspace");
+  const externalClient = join(root, "external-oauth-client.json");
+
+  try {
+    const scaffold = spawnSync(process.execPath, [cli, target, "--no-install", "--no-git"], {
+      encoding: "utf8",
+    });
+    assert.equal(scaffold.status, 0, scaffold.stderr);
+
+    await mkdir(join(target, "credentials"));
+    await writeFile(externalClient, "{}\n", { mode: 0o644 });
+    await symlink(externalClient, join(target, "credentials/google-oauth-client.json"));
+
+    const result = spawnSync(
+      process.execPath,
+      [
+        join(target, "bin/add-account.mjs"),
+        "person@example.com",
+        "--gmail=read",
+        "--drive=none",
+        "--no-login",
+      ],
+      { encoding: "utf8" },
+    );
+
+    assert.equal(result.status, 66);
+    assert.match(result.stderr, /must be a regular file, not a symlink/);
+    assert.equal((await lstat(externalClient)).mode & 0o777, 0o644);
   } finally {
     await rm(root, { recursive: true, force: true });
   }

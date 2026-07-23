@@ -6,7 +6,6 @@ import {
   chmodSync,
   lstatSync,
   mkdirSync,
-  statSync,
   symlinkSync,
   writeFileSync,
 } from "node:fs";
@@ -32,7 +31,7 @@ function usage(message) {
 
 function isFile(path) {
   try {
-    return statSync(path).isFile();
+    return lstatSync(path).isFile();
   } catch (error) {
     if (error.code === "ENOENT") return false;
     throw error;
@@ -99,7 +98,8 @@ const emailFingerprint = createHash("sha256")
 const slug = `${readableSlug}-${emailFingerprint}`;
 
 const root = dirname(dirname(fileURLToPath(import.meta.url)));
-const oauthClient = join(root, "credentials", "google-oauth-client.json");
+const credentialsDir = join(root, "credentials");
+const oauthClient = join(credentialsDir, "google-oauth-client.json");
 const accountDir = join(root, "accounts", slug);
 const configDir = join(accountDir, "gws");
 const clientLink = join(configDir, "client_secret.json");
@@ -112,7 +112,16 @@ function saveAccessProfile() {
   chmodSync(accessProfile, 0o600);
 }
 
-if (!isFile(oauthClient)) fail(EX_NOINPUT, `OAuth client not found: ${oauthClient}`);
+if (!isFile(oauthClient)) {
+  fail(EX_NOINPUT, `OAuth client must be a regular file, not a symlink: ${oauthClient}`);
+}
+
+const credentialsDirectory = lstatSync(credentialsDir);
+if (!credentialsDirectory.isDirectory() || credentialsDirectory.isSymbolicLink()) {
+  fail(EX_NOINPUT, `credentials path must be a regular directory: ${credentialsDir}`);
+}
+chmodSync(credentialsDir, 0o700);
+chmodSync(oauthClient, 0o600);
 
 mkdirSync(configDir, { recursive: true, mode: 0o700 });
 chmodSync(accountDir, 0o700);
