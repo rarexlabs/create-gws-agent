@@ -1,0 +1,4 @@
+interface:
+  display_name: "Setup"
+  short_description: "Prepare Google Cloud OAuth and connect an account"
+  default_prompt: "Use $setup to prepare this Google Workspace agent."

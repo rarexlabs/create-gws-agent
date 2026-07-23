@@ -1,0 +1,6 @@
+node_modules/
+credentials/
+accounts/*/gws/
+.env
+.DS_Store
+tmp/

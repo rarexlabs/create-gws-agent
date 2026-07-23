@@ -1,0 +1,4 @@
+interface:
+  display_name: "Google Drive"
+  short_description: "Manage Drive safely with repository-local gws"
+  default_prompt: "Use $drive to find and manage files in my Google Drive safely."

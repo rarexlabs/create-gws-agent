@@ -1,0 +1,17 @@
+{
+  "name": "gworkspace-agent",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Minimal npm workspace for Gmail and Google Drive agent workflows",
+  "packageManager": "npm@11.6.2",
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "gws": "node bin/gws-account.mjs",
+    "account:add": "node bin/add-account.mjs"
+  },
+  "devDependencies": {
+    "@googleworkspace/cli": "0.22.5"
+  }
+}

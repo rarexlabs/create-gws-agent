@@ -1,0 +1,31 @@
+{
+  "name": "create-gws-agent",
+  "version": "0.1.0",
+  "description": "Scaffold a minimal npm workspace for Gmail and Google Drive agents",
+  "type": "module",
+  "bin": {
+    "create-gws-agent": "bin/create.mjs"
+  },
+  "files": [
+    "bin/create.mjs",
+    "template"
+  ],
+  "scripts": {
+    "test": "node --test",
+    "pack:check": "npm pack --dry-run"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "keywords": [
+    "google-workspace",
+    "gmail",
+    "google-drive",
+    "codex",
+    "agent",
+    "scaffold"
+  ],
+  "publishConfig": {
+    "access": "public"
+  }
+}
