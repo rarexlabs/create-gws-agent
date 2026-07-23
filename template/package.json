@@ -9,11 +9,11 @@
     "node": ">=22.9.0"
   },
   "scripts": {
-    "gws": "node bin/gws-account.mjs",
-    "account:add": "node bin/add-account.mjs"
+    "gws": "mgws run",
+    "account:add": "mgws account add"
   },
   "dependencies": {
-    "@googleworkspace/cli": "0.22.5"
+    "multi-gws": "0.0.1"
   },
   "allowScripts": {
     "@googleworkspace/cli@0.22.5": true

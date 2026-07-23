@@ -1,6 +1,6 @@
 # Google Workspace Agent
 
-This repository provides account-scoped access to Gmail and Google Drive through a repository-local `gws` installation.
+This repository provides account-scoped access to Gmail and Google Drive through `mgws`, a multi-account safety wrapper for the Google Workspace CLI.
 
 ## Commands
 
@@ -16,7 +16,7 @@ Add and authorize an account with:
 npm run account:add -- <email-address> --gmail=<none|read|manage> --drive=<none|read|manage>
 ```
 
-The wrapper selects `accounts/<account-slug>/gws` through `GOOGLE_WORKSPACE_CLI_CONFIG_DIR` and uses the operating system's secure credential storage with the CLI's encrypted file fallback.
+`mgws` selects `accounts/<account-slug>/gws` through `GOOGLE_WORKSPACE_CLI_CONFIG_DIR` and uses the operating system's secure credential storage with the CLI's encrypted file fallback.
 
 ## Credentials
 

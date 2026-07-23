@@ -12,6 +12,8 @@ Open the generated workspace in Codex or another compatible agent, then ask:
 Use $setup to prepare this Google Workspace agent.
 ```
 
+The generated workspace uses [`multi-gws`](https://www.npmjs.com/package/multi-gws), through its `mgws` command, to isolate accounts and apply safety rules while forwarding Google Workspace CLI commands.
+
 The setup skill checks dependencies, guides Google OAuth client creation when needed, and connects the first Google account.
 
 ## Requirements

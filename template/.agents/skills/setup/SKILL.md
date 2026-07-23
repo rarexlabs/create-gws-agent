@@ -9,14 +9,14 @@ Inspect the workspace first and perform only missing steps.
 
 ## Workflow
 
-1. Check whether `node_modules/.bin/gws` exists. If it does not, run `npm install` and stop if installation fails.
+1. Check whether `node_modules/.bin/mgws` exists. If it does not, run `npm install` and stop if installation fails.
 2. Check whether `credentials/google-oauth-client.json` exists without printing or reading its contents.
 3. If the OAuth client is missing, complete **Create the OAuth client** with the user. Pause after each group of Google Cloud Console steps and wait for the user before continuing.
 4. Check for account profiles at `accounts/<account-slug>/gws/access.json`.
 5. If no account profile exists, use the repository `add-account` skill to connect the first account. Do not duplicate its permission-selection workflow.
 6. If one or more profiles exist, report the connected account emails and access levels from those non-secret profile files.
 
-Setup is complete only when the local `gws` executable, shared OAuth client, and at least one account profile all exist.
+Setup is complete only when the local `mgws` executable, shared OAuth client, and at least one account profile all exist.
 
 ## Create the OAuth client
 
