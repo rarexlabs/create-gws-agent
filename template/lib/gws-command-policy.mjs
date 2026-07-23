@@ -16,11 +16,41 @@ const DRIVE_CONFIRM_METHODS = new Set([
   "permissions:update",
   "permissions:delete",
 ]);
+const GWS_VALUE_FLAGS = new Set([
+  "--api-version",
+  "--format",
+  "--json",
+  "--output",
+  "--page-delay",
+  "--page-limit",
+  "--params",
+  "--upload",
+  "--upload-content-type",
+]);
 
 const allow = Object.freeze({ action: "allow" });
 
+function positionalArguments(args) {
+  const positional = [];
+
+  for (let index = 0; index < args.length; index += 1) {
+    const argument = args[index];
+    if (!argument.startsWith("--")) {
+      positional.push(argument);
+      continue;
+    }
+
+    const [flag] = argument.split("=", 1);
+    if (GWS_VALUE_FLAGS.has(flag) && !argument.includes("=")) index += 1;
+  }
+
+  return positional;
+}
+
 export function classifyGwsCommand(args) {
-  const [service, resource, collection, method] = args;
+  const commandArgs = positionalArguments(args);
+  const [serviceWithVersion, resource, collection, method] = commandArgs;
+  const service = serviceWithVersion?.split(":", 1)[0];
 
   if (service === "gmail") {
     if (GMAIL_CONFIRM_ALIASES.has(resource)) {

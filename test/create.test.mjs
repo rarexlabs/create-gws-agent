@@ -31,6 +31,9 @@ test("scaffolds the workspace without private state", async () => {
 
     const generatedPackage = JSON.parse(await readFile(join(target, "package.json"), "utf8"));
     assert.equal(generatedPackage.name, "gworkspace-agent");
+    assert.equal(generatedPackage.packageManager, "npm@10.9.4");
+    assert.equal(generatedPackage.engines.node, ">=18.17.0");
+    assert.deepEqual(generatedPackage.os, ["darwin"]);
     assert.equal(generatedPackage.scripts.gws, "node bin/gws-account.mjs");
     assert.equal(generatedPackage.scripts["account:add"], "node bin/add-account.mjs");
     await readFile(join(target, "AGENTS.md"), "utf8");
@@ -141,6 +144,80 @@ test("wrapper distinguishes prohibited and confirmation-required operations", as
   }
 });
 
+test("wrapper ignores inherited credentials for a different account", async () => {
+  const root = await mkdtemp(join(tmpdir(), "create-gws-agent-"));
+  const target = join(root, "my-workspace");
+  const fakeGws = join(root, "fake-gws");
+
+  try {
+    const scaffold = spawnSync(process.execPath, [cli, target, "--no-install", "--no-git"], {
+      encoding: "utf8",
+    });
+    assert.equal(scaffold.status, 0, scaffold.stderr);
+
+    await mkdir(join(target, "accounts/test/gws"), { recursive: true });
+    await writeFile(
+      join(target, ".env"),
+      "GOOGLE_WORKSPACE_CLI_CREDENTIALS_FILE=/tmp/dotenv-wrong-account.json\n",
+    );
+    await writeFile(
+      fakeGws,
+      "#!/bin/sh\nif [ -f .env ] && [ -z \"${GOOGLE_WORKSPACE_CLI_CREDENTIALS_FILE+x}\" ]; then . ./.env; fi\nprintf 'cwd=%s\\n' \"$PWD\"\nprintf 'token=%s\\n' \"$GOOGLE_WORKSPACE_CLI_TOKEN\"\nprintf 'credentials_set=%s\\n' \"${GOOGLE_WORKSPACE_CLI_CREDENTIALS_FILE+x}\"\nprintf 'client_id_set=%s\\n' \"${GOOGLE_WORKSPACE_CLI_CLIENT_ID+x}\"\nprintf 'client_secret_set=%s\\n' \"${GOOGLE_WORKSPACE_CLI_CLIENT_SECRET+x}\"\nprintf 'adc=%s\\n' \"$GOOGLE_APPLICATION_CREDENTIALS\"\nprintf '%s\\n' \"$@\"\n",
+    );
+    await chmod(fakeGws, 0o755);
+
+    const result = spawnSync(
+      process.execPath,
+      [
+        join(target, "bin/gws-account.mjs"),
+        "test",
+        "drive",
+        "files",
+        "list",
+        "--upload",
+        "relative.txt",
+        "--output=download.bin",
+      ],
+      {
+        encoding: "utf8",
+        env: {
+          ...process.env,
+          GWS_EXECUTABLE: fakeGws,
+          GOOGLE_WORKSPACE_CLI_CLIENT_ID: "wrong-client-id",
+          GOOGLE_WORKSPACE_CLI_CLIENT_SECRET: "wrong-client-secret",
+          GOOGLE_WORKSPACE_CLI_TOKEN: "wrong-account-token",
+          GOOGLE_WORKSPACE_CLI_CREDENTIALS_FILE: "/tmp/wrong-account.json",
+          GOOGLE_APPLICATION_CREDENTIALS: "/tmp/wrong-adc.json",
+        },
+      },
+    );
+
+    assert.equal(result.status, 0, result.stderr);
+    const canonicalTarget = await realpath(target);
+    const configDir = join(canonicalTarget, "accounts/test/gws");
+    assert.equal(
+      result.stdout,
+      [
+        `cwd=${join(configDir, ".runtime")}`,
+        "token=",
+        "credentials_set=",
+        "client_id_set=",
+        "client_secret_set=",
+        `adc=${join(configDir, ".runtime", ".env", "no-adc")}`,
+        "drive",
+        "files",
+        "list",
+        "--upload",
+        join(canonicalTarget, "relative.txt"),
+        `--output=${join(canonicalTarget, "download.bin")}`,
+        "",
+      ].join("\n"),
+    );
+  } finally {
+    await rm(root, { recursive: true, force: true });
+  }
+});
+
 test("account setup creates private account state linked to the shared OAuth client", async () => {
   const root = await mkdtemp(join(tmpdir(), "create-gws-agent-"));
   const target = join(root, "my-workspace");
@@ -168,9 +245,10 @@ test("account setup creates private account state linked to the shared OAuth cli
       { encoding: "utf8", env: { ...process.env, GWS_EXECUTABLE: fakeGws } },
     );
     assert.equal(result.status, 0, result.stderr);
-    assert.match(result.stdout, /Account slug: roy-test-home-example-com/);
+    const slug = result.stdout.match(/Account slug: (roy-test-home-example-com-\S+)/)?.[1];
+    assert.ok(slug);
 
-    const accountDir = join(target, "accounts/roy-test-home-example-com");
+    const accountDir = join(target, "accounts", slug);
     const configDir = join(accountDir, "gws");
     const link = join(configDir, "client_secret.json");
     const accessProfile = JSON.parse(await readFile(join(configDir, "access.json"), "utf8"));
@@ -186,6 +264,56 @@ test("account setup creates private account state linked to the shared OAuth cli
       result.stdout,
       /auth\nlogin\n--scopes\nhttps:\/\/www\.googleapis\.com\/auth\/gmail\.modify,https:\/\/www\.googleapis\.com\/auth\/gmail\.labels,https:\/\/www\.googleapis\.com\/auth\/gmail\.settings\.basic,https:\/\/www\.googleapis\.com\/auth\/drive\.readonly/,
     );
+  } finally {
+    await rm(root, { recursive: true, force: true });
+  }
+});
+
+test("distinct email addresses use distinct account directories", async () => {
+  const root = await mkdtemp(join(tmpdir(), "create-gws-agent-"));
+  const target = join(root, "my-workspace");
+
+  try {
+    const scaffold = spawnSync(process.execPath, [cli, target, "--no-install", "--no-git"], {
+      encoding: "utf8",
+    });
+    assert.equal(scaffold.status, 0, scaffold.stderr);
+
+    await mkdir(join(target, "credentials"));
+    await writeFile(join(target, "credentials/google-oauth-client.json"), "{}\n");
+
+    const add = (email) =>
+      spawnSync(
+        process.execPath,
+        [
+          join(target, "bin/add-account.mjs"),
+          email,
+          "--gmail=read",
+          "--drive=none",
+          "--no-login",
+        ],
+        { encoding: "utf8" },
+      );
+
+    const plusAddress = add("a+b@example.com");
+    const dashAddress = add("a-b@example.com");
+    assert.equal(plusAddress.status, 0, plusAddress.stderr);
+    assert.equal(dashAddress.status, 0, dashAddress.stderr);
+
+    const plusSlug = plusAddress.stdout.match(/Account slug: (\S+)/)?.[1];
+    const dashSlug = dashAddress.stdout.match(/Account slug: (\S+)/)?.[1];
+    assert.ok(plusSlug);
+    assert.ok(dashSlug);
+    assert.notEqual(plusSlug, dashSlug);
+
+    const plusProfile = JSON.parse(
+      await readFile(join(target, "accounts", plusSlug, "gws", "access.json"), "utf8"),
+    );
+    const dashProfile = JSON.parse(
+      await readFile(join(target, "accounts", dashSlug, "gws", "access.json"), "utf8"),
+    );
+    assert.equal(plusProfile.email, "a+b@example.com");
+    assert.equal(dashProfile.email, "a-b@example.com");
   } finally {
     await rm(root, { recursive: true, force: true });
   }

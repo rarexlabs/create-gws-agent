@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 
 import { spawnSync } from "node:child_process";
+import { createHash } from "node:crypto";
 import {
   chmodSync,
   lstatSync,
@@ -86,11 +87,16 @@ try {
   throw error;
 }
 
-const slug = email
-  .toLowerCase()
+const normalizedEmail = email.toLowerCase();
+const readableSlug = normalizedEmail
   .replace(/[^a-z0-9]+/g, "-")
   .replace(/^-+|-+$/g, "");
-if (!slug) fail(EX_USAGE, `could not derive an account slug from: ${email}`);
+if (!readableSlug) fail(EX_USAGE, `could not derive an account slug from: ${email}`);
+const emailFingerprint = createHash("sha256")
+  .update(normalizedEmail)
+  .digest("base64url")
+  .slice(0, 16);
+const slug = `${readableSlug}-${emailFingerprint}`;
 
 const root = dirname(dirname(fileURLToPath(import.meta.url)));
 const oauthClient = join(root, "credentials", "google-oauth-client.json");
