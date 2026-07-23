@@ -16,7 +16,7 @@
     "pack:check": "npm pack --dry-run"
   },
   "engines": {
-    "node": ">=22"
+    "node": ">=22.9.0"
   },
   "keywords": [
     "google-workspace",

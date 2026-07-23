@@ -4,9 +4,9 @@
   "private": true,
   "description": "Minimal npm workspace for Gmail and Google Drive agent workflows",
   "license": "MIT",
-  "packageManager": "npm@10.9.4",
+  "packageManager": "npm@11.18.0",
   "engines": {
-    "node": ">=22"
+    "node": ">=22.9.0"
   },
   "scripts": {
     "gws": "node bin/gws-account.mjs",
@@ -14,5 +14,8 @@
   },
   "dependencies": {
     "@googleworkspace/cli": "0.22.5"
+  },
+  "allowScripts": {
+    "@googleworkspace/cli@0.22.5": true
   }
 }

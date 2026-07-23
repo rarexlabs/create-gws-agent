@@ -16,8 +16,8 @@ The setup skill checks dependencies, guides Google OAuth client creation when ne
 
 ## Requirements
 
-- Node.js 22 or newer
-- npm 10 (the generated project pins npm 10.9.4)
+- Node.js 22.9 or newer
+- npm 11 (the generated project pins npm 11.18.0)
 
 ## Options
 

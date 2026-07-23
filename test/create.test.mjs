@@ -31,8 +31,11 @@ test("scaffolds the workspace without private state", async () => {
 
     const generatedPackage = JSON.parse(await readFile(join(target, "package.json"), "utf8"));
     assert.equal(generatedPackage.name, "gworkspace-agent");
-    assert.equal(generatedPackage.packageManager, "npm@10.9.4");
-    assert.equal(generatedPackage.engines.node, ">=22");
+    assert.equal(generatedPackage.packageManager, "npm@11.18.0");
+    assert.equal(generatedPackage.engines.node, ">=22.9.0");
+    assert.deepEqual(generatedPackage.allowScripts, {
+      "@googleworkspace/cli@0.22.5": true,
+    });
     assert.equal("os" in generatedPackage, false);
     assert.equal(generatedPackage.license, "MIT");
     assert.equal(generatedPackage.scripts.gws, "node bin/gws-account.mjs");
