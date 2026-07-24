@@ -16,7 +16,9 @@ test("scaffolds a workspace that uses multi-gws without private state", async ()
       encoding: "utf8",
     });
     assert.equal(result.status, 0, result.stderr);
-    assert.match(result.stdout, /Next step:\n  Open the scaffold directory in Codex and run \$setup\./);
+    assert.ok(
+      result.stdout.includes(`Next step:\n  Open ${target} in Codex and run $setup.`),
+    );
     assert.doesNotMatch(result.stdout, /\bcd\b/);
 
     const generatedPackage = JSON.parse(await readFile(join(target, "package.json"), "utf8"));

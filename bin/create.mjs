@@ -78,4 +78,4 @@ if (initializeGit) {
   }
 }
 
-console.log("\nNext step:\n  Open the scaffold directory in Codex and run $setup.");
+console.log(`\nNext step:\n  Open ${target} in Codex and run $setup.`);
