@@ -17,6 +17,10 @@ Add and authorize an account with:
 npm run account:add -- <email-address> --gmail=<none|read|manage> --drive=<none|read|manage> --calendar=<none|read|manage>
 ```
 
+OAuth authorization requires live, unbuffered output so its Google URL is
+visible. Use the plain npm command by default. If this environment requires RTK,
+run the authorization command through `rtk proxy`.
+
 Use the repository skills:
 
 - `$setup` for first-time setup

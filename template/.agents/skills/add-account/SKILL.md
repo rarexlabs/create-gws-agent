@@ -30,7 +30,7 @@ Use the repository command only after translating the user's choice into explici
 6. Summarize a custom selection and obtain confirmation. Require at least one enabled service.
 7. Before starting authorization, explain:
 
-   > I'm going to open Google in your browser and ask you to approve the permissions we selected. Because this is a private setup, Google may say the app is unverified and show the Google Cloud project name chosen during setup. Before continuing, make sure you recognize the displayed name.
+   > I'm going to start Google authorization for the permissions we selected. I'll give you a Google authorization link to open. Because this is a private setup, Google may say the app is unverified and show the Google Cloud project name chosen during setup. Before continuing, make sure you recognize the displayed name.
 
 8. Run:
 
@@ -38,7 +38,14 @@ Use the repository command only after translating the user's choice into explici
 npm run account:add -- <email-address> --gmail=<level> --drive=<level> --calendar=<level>
 ```
 
-9. Tell the user to select the same Google account in the browser and complete Google's OAuth consent. Do not claim success until the command exits successfully.
+   Use the plain `npm` command by default. OAuth authorization requires live, unbuffered command output. If the active environment requires RTK, bypass its output filtering for this interactive command:
+
+```bash
+rtk proxy npm run account:add -- <email-address> --gmail=<level> --drive=<level> --calendar=<level>
+```
+
+   Do not use the RTK form where RTK is unavailable.
+9. Watch the live command output. As soon as it prints the Google OAuth URL, surface the OAuth URL to the user as a clickable link. Tell the user to select the same Google account and complete Google's consent flow. Do not claim success until the command exits successfully.
 10. Report the account slug and selected access. The command records the non-secret profile at `accounts/<account-slug>/gws/access.json`.
 
 Do not use `--no-login`; it exists for local validation only. Do not pass raw OAuth scope URLs.

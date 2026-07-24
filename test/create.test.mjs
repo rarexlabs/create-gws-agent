@@ -60,6 +60,12 @@ test("scaffolds a workspace that uses multi-gws without private state", async ()
       "utf8",
     );
     assert.match(addAccountSkill, /--calendar=<level>/);
+    assert.match(addAccountSkill, /Use the plain `npm` command by default/);
+    assert.match(addAccountSkill, /If the active environment requires RTK/);
+    assert.match(addAccountSkill, /rtk proxy npm run account:add/);
+    assert.match(addAccountSkill, /surface the OAuth URL/);
+    assert.match(addAccountSkill, /I'll give you a Google authorization link/);
+    assert.doesNotMatch(addAccountSkill, /command will print a Google URL/);
     await assert.rejects(readFile(join(target, "bin/gws-account.mjs"), "utf8"));
     await assert.rejects(readFile(join(target, "lib/gws-command-policy.mjs"), "utf8"));
     const generatedLock = JSON.parse(await readFile(join(target, "package-lock.json"), "utf8"));
