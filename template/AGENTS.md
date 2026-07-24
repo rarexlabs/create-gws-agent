@@ -57,7 +57,8 @@ Always show a human-readable preview and obtain explicit confirmation immediatel
 - granting public or external Drive access;
 - changing Drive permissions;
 - transferring Drive ownership;
-- creating, changing, moving, or cancelling Calendar events; or
+- creating Calendar events with attendees other than the connected account;
+- changing, moving, or cancelling Calendar events; or
 - changing Calendar sharing rules.
 
 The preview must identify:
@@ -76,6 +77,6 @@ Confirmation applies only to the exact account, action, content, and targets sho
 ### Prohibited actions
 
 - Never permanently delete Gmail messages, threads, or drafts. Interpret deleting email as moving it to Trash.
-- Never permanently delete Drive files, empty Drive Trash, or delete Drive revisions.
+- Never permanently delete Drive files or shared drives, empty Drive Trash, or delete Drive revisions.
 - Never permanently clear or delete a calendar.
 - Confirmation does not override these prohibitions.

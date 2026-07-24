@@ -15,7 +15,7 @@ Use the repository command only after translating the user's choice into explici
 
    - Gmail manage: read and organize mail; manage labels, drafts, settings, and filters; send only with confirmation.
    - Drive manage: view and manage files and folders; sharing changes require confirmation.
-   - Calendar manage: view calendars and availability; manage events and sharing; event and sharing changes require confirmation.
+   - Calendar manage: view calendars and availability; manage events and sharing; inviting others, existing-event changes, and sharing changes require confirmation.
    - Permanent Gmail and Drive deletion and permanently clearing or deleting calendars remain prohibited.
 
    Ask: `Use the recommended Gmail manage, Drive manage, and Calendar manage access for <email-address>?`
