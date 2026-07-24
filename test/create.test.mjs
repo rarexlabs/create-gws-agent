@@ -12,11 +12,12 @@ test("scaffolds a workspace that uses multi-gws without private state", async ()
   const target = join(root, "my-workspace");
 
   try {
-    const result = spawnSync(process.execPath, [cli, target, "--no-install", "--no-git"], {
+    const result = spawnSync(process.execPath, [cli, target, "--no-install"], {
       encoding: "utf8",
     });
     assert.equal(result.status, 0, result.stderr);
-    assert.match(result.stdout, /\$setup\b/);
+    assert.match(result.stdout, /Next step:\n  Open this directory in Codex and run \$setup\./);
+    assert.doesNotMatch(result.stdout, /\bcd\b/);
 
     const generatedPackage = JSON.parse(await readFile(join(target, "package.json"), "utf8"));
     assert.equal(generatedPackage.name, "gworkspace-agent");
@@ -81,7 +82,7 @@ test("refuses to overwrite a non-empty destination", async () => {
   try {
     await mkdir(target);
     await writeFile(join(target, "keep.txt"), "keep\n");
-    const result = spawnSync(process.execPath, [cli, target, "--no-install", "--no-git"], {
+    const result = spawnSync(process.execPath, [cli, target, "--no-install"], {
       encoding: "utf8",
     });
     assert.notEqual(result.status, 0);
@@ -96,4 +97,43 @@ test("scaffold contains no empty implementation directories", async () => {
   const entries = await readdir(resolve("template"));
   assert.equal(entries.includes("bin"), false);
   assert.equal(entries.includes("lib"), false);
+});
+
+test("does not initialize git by default", async () => {
+  const root = await mkdtemp(join(tmpdir(), "create-gws-agent-"));
+  const target = join(root, "my-workspace");
+
+  try {
+    const result = spawnSync(process.execPath, [cli, target, "--no-install"], {
+      encoding: "utf8",
+    });
+    assert.equal(result.status, 0, result.stderr);
+
+    const gitResult = spawnSync("git", ["-C", target, "rev-parse", "--git-dir"], {
+      encoding: "utf8",
+    });
+    assert.notEqual(gitResult.status, 0);
+  } finally {
+    await rm(root, { recursive: true, force: true });
+  }
+});
+
+test("initializes git when requested", async () => {
+  const root = await mkdtemp(join(tmpdir(), "create-gws-agent-"));
+  const target = join(root, "my-workspace");
+
+  try {
+    const result = spawnSync(process.execPath, [cli, target, "--no-install", "--git"], {
+      encoding: "utf8",
+    });
+    assert.equal(result.status, 0, result.stderr);
+
+    const gitResult = spawnSync("git", ["-C", target, "branch", "--show-current"], {
+      encoding: "utf8",
+    });
+    assert.equal(gitResult.status, 0, gitResult.stderr);
+    assert.equal(gitResult.stdout.trim(), "main");
+  } finally {
+    await rm(root, { recursive: true, force: true });
+  }
 });

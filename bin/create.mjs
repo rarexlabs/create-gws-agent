@@ -9,7 +9,7 @@ const usage = `Usage: create-gws-agent [directory] [options]
 
 Options:
   --no-install  Skip npm install
-  --no-git      Skip git initialization
+  --git         Initialize a git repository
   --help        Show this help`;
 
 function fail(message) {
@@ -25,7 +25,7 @@ function run(command, args, cwd) {
 
 let destination;
 let install = true;
-let initializeGit = true;
+let initializeGit = false;
 
 for (const argument of process.argv.slice(2)) {
   if (argument === "--help" || argument === "-h") {
@@ -36,8 +36,8 @@ for (const argument of process.argv.slice(2)) {
     install = false;
     continue;
   }
-  if (argument === "--no-git") {
-    initializeGit = false;
+  if (argument === "--git") {
+    initializeGit = true;
     continue;
   }
   if (argument.startsWith("-")) fail(`unknown option: ${argument}`);
@@ -78,5 +78,4 @@ if (initializeGit) {
   }
 }
 
-const relativeTarget = destination || "gworkspace-agent";
-console.log(`\nNext steps:\n  cd ${relativeTarget}\n  # Open this workspace in your agent and ask:\n  # Use $setup to prepare this Google Workspace agent.`);
+console.log("\nNext step:\n  Open this directory in Codex and run $setup.");

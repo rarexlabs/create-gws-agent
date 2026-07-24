@@ -25,7 +25,7 @@ The setup skill checks dependencies, guides Google OAuth client creation when ne
 
 ```text
 --no-install  Skip npm install
---no-git      Skip git initialization
+--git         Initialize a git repository
 --help        Show usage
 ```
 
