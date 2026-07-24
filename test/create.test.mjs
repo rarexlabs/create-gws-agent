@@ -22,7 +22,7 @@ test("scaffolds a workspace that uses multi-gws without private state", async ()
     assert.equal(generatedPackage.name, "gworkspace-agent");
     assert.equal(generatedPackage.packageManager, "npm@11.18.0");
     assert.equal(generatedPackage.engines.node, ">=22.9.0");
-    assert.deepEqual(generatedPackage.dependencies, { "multi-gws": "0.0.2" });
+    assert.deepEqual(generatedPackage.dependencies, { "multi-gws": "0.0.3" });
     assert.deepEqual(generatedPackage.allowScripts, {
       "@googleworkspace/cli@0.22.5": true,
     });
@@ -61,10 +61,10 @@ test("scaffolds a workspace that uses multi-gws without private state", async ()
     await assert.rejects(readFile(join(target, "bin/gws-account.mjs"), "utf8"));
     await assert.rejects(readFile(join(target, "lib/gws-command-policy.mjs"), "utf8"));
     const generatedLock = JSON.parse(await readFile(join(target, "package-lock.json"), "utf8"));
-    assert.equal(generatedLock.packages["node_modules/multi-gws"].version, "0.0.2");
+    assert.equal(generatedLock.packages["node_modules/multi-gws"].version, "0.0.3");
     assert.equal(
       generatedLock.packages["node_modules/multi-gws"].resolved,
-      "https://registry.npmjs.org/multi-gws/-/multi-gws-0.0.2.tgz",
+      "https://registry.npmjs.org/multi-gws/-/multi-gws-0.0.3.tgz",
     );
 
     const gitignore = await readFile(join(target, ".gitignore"), "utf8");
