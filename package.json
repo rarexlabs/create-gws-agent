@@ -1,6 +1,6 @@
 {
   "name": "create-gws-agent",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "Scaffold a minimal npm workspace for Gmail, Google Drive, and Google Calendar agents",
   "license": "MIT",
   "type": "module",
