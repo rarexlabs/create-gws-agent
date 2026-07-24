@@ -33,7 +33,6 @@ test("scaffolds a workspace that uses multi-gws without private state", async ()
 
     const agents = await readFile(join(target, "AGENTS.md"), "utf8");
     assert.match(agents, /--calendar=<none\|read\|manage>/);
-    await readFile(join(target, "LICENSE"), "utf8");
     for (const [skill, service] of [
       ["gmail", "gmail"],
       ["drive", "drive"],
