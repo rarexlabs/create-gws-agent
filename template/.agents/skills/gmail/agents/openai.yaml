@@ -1,4 +1,4 @@
 interface:
   display_name: "Gmail"
-  short_description: "Manage Gmail safely with repository-local gws"
-  default_prompt: "Use $gmail to review and triage my Gmail inbox safely."
+  short_description: "Customize Gmail workflows with repository-local gws"
+  default_prompt: "Use $gmail to help with my Gmail workflow."

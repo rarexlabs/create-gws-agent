@@ -34,14 +34,20 @@ test("scaffolds a workspace that uses multi-gws without private state", async ()
     const agents = await readFile(join(target, "AGENTS.md"), "utf8");
     assert.match(agents, /--calendar=<none\|read\|manage>/);
     await readFile(join(target, "LICENSE"), "utf8");
-    await readFile(join(target, ".agents/skills/gmail/SKILL.md"), "utf8");
-    await readFile(join(target, ".agents/skills/drive/SKILL.md"), "utf8");
-    const calendarSkill = await readFile(
-      join(target, ".agents/skills/calendar/SKILL.md"),
-      "utf8",
-    );
-    assert.match(calendarSkill, /npm run gws -- <account-slug> calendar/);
-    assert.match(calendarSkill, /pass `--confirm`/);
+    for (const [skill, service] of [
+      ["gmail", "gmail"],
+      ["drive", "drive"],
+      ["calendar", "calendar"],
+    ]) {
+      const contents = await readFile(
+        join(target, `.agents/skills/${skill}/SKILL.md`),
+        "utf8",
+      );
+      assert.match(contents, new RegExp(`npm run gws -- <account-slug> ${service}`));
+      assert.match(contents, /## Defaults/);
+      assert.match(contents, /Add the user's/);
+      assert.ok(contents.length < 1_200, `${skill} should remain a minimal starter skill`);
+    }
     const setupSkill = await readFile(
       join(target, ".agents/skills/setup/SKILL.md"),
       "utf8",

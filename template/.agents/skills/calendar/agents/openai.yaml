@@ -1,4 +1,4 @@
 interface:
   display_name: "Google Calendar"
-  short_description: "Manage Google Calendar events safely"
-  default_prompt: "Use $calendar to review and manage my Google Calendar safely."
+  short_description: "Customize Calendar workflows with repository-local gws"
+  default_prompt: "Use $calendar to help with my Google Calendar workflow."

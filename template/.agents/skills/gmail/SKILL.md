@@ -11,15 +11,10 @@ Run Gmail commands through the account wrapper:
 npm run gws -- <account-slug> gmail <arguments...>
 ```
 
-## Workflow
+## Defaults
 
-1. Confirm the account when the request does not make it clear.
-2. Inspect messages before proposing or performing mutations.
-3. Summarize private content unless the user requests the full body.
-4. Follow the repository action-authorization policy in `AGENTS.md`.
-5. For existing email, identify messages by sender, subject, and date. For outgoing email, show the recipients, subject, and final message body.
-6. For bulk work, preview the human-readable scope and number of messages. Retain exact message IDs privately for accurate execution.
-7. Send, reply, or forward only after explicit confirmation of the final preview, then pass `--confirm` immediately after the account slug.
-8. Verify the resulting labels or mailbox state.
+- Confirm the account when it is unclear, then inspect relevant messages before acting.
+- Summarize private content unless the user asks for the full body. Identify messages by sender, subject, and date.
+- Follow the preview and confirmation rules in `AGENTS.md` for changes, then verify the resulting mailbox state.
 
-Never permanently delete messages, threads, or drafts. Interpret “delete” as move to Trash. Labels, archive, and Trash are reversible and may be performed when the user explicitly requests the exact change.
+Add the user's mailbox organization, labels, and triage preferences here.
