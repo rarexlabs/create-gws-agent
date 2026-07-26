@@ -13,7 +13,7 @@
     "account:add": "mgws account add"
   },
   "dependencies": {
-    "multi-gws": "0.0.3"
+    "multi-gws": "0.0.5"
   },
   "allowScripts": {
     "@googleworkspace/cli@0.22.5": true
