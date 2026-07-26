@@ -45,8 +45,20 @@ rtk proxy npm run account:add -- <email-address> --gmail=<level> --drive=<level>
 ```
 
    Do not use the RTK form where RTK is unavailable.
-9. Watch the live command output. As soon as it prints the Google OAuth URL, surface the OAuth URL to the user as a clickable link. Tell the user to select the same Google account and complete Google's consent flow. Do not claim success until the command exits successfully.
-10. Report the account slug and selected access. The command records the non-secret profile at `accounts/<account-slug>/gws/access.json`.
+9. Watch only until the live output prints the account slug and Google OAuth URL. Immediately surface the OAuth URL to the user as a clickable link, tell them to select the same Google account and complete Google's consent flow, and leave the authorization command running in the background. Then end the turn immediately and ask the user to reply `done` after Google confirms authorization. Do not poll the background command and do not claim success yet.
+10. When the user replies:
+
+    - Do not start a second authorization command.
+    - Check the existing background command once. If it is still running, say that Google has not completed the callback yet and end the turn without polling.
+    - If it failed, report the useful error and offer to retry.
+    - If it completed successfully, verify with:
+
+      ```bash
+      npm run gws -- <account-slug> auth status
+      ```
+
+      Require `credentials_readable` and `token_valid` to be `true`, and confirm that the returned email matches the requested account. If the background command is no longer inspectable, use this status check as the source of truth.
+11. After successful verification, report the account slug and selected access. The command records the non-secret profile at `accounts/<account-slug>/gws/access.json`.
 
 Do not use `--no-login`; it exists for local validation only. Do not pass raw OAuth scope URLs.
 

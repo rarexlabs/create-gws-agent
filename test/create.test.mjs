@@ -65,6 +65,13 @@ test("scaffolds a workspace that uses multi-gws without private state", async ()
     assert.match(addAccountSkill, /rtk proxy npm run account:add/);
     assert.match(addAccountSkill, /surface the OAuth URL/);
     assert.match(addAccountSkill, /I'll give you a Google authorization link/);
+    assert.match(addAccountSkill, /leave the authorization command running in the background/);
+    assert.match(addAccountSkill, /end the turn immediately/);
+    assert.match(addAccountSkill, /reply `done`/);
+    assert.match(addAccountSkill, /Do not poll (?:the )?background command/);
+    assert.match(addAccountSkill, /auth status/);
+    assert.match(addAccountSkill, /`credentials_readable` and `token_valid` to be `true`/);
+    assert.match(addAccountSkill, /Do not start a second authorization command/);
     assert.doesNotMatch(addAccountSkill, /command will print a Google URL/);
     await assert.rejects(readFile(join(target, "bin/gws-account.mjs"), "utf8"));
     await assert.rejects(readFile(join(target, "lib/gws-command-policy.mjs"), "utf8"));
